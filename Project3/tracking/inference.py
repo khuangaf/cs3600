@@ -316,8 +316,11 @@ class ParticleFilter(InferenceModule):
             # for p in self.legalPositions:
             #     allPossible[p] = 0
             # allPossible[self.getJailPosition()] = 1.0
-            for p in self.particles:
-                p = self.getJailPosition()
+            for i,p in enumerate(self.particles):
+                self.particles[i] = self.getJailPosition()
+            allPossible = util.Counter()
+            allPossible[self.getJailPosition()] = 1.0
+            
         else:        
             for p in self.particles:
                 trueDistance = util.manhattanDistance(p, pacmanPosition)
@@ -358,13 +361,9 @@ class ParticleFilter(InferenceModule):
                 allPossible[newPos] += prob
         allPossible.normalize()
         self.beliefs = allPossible
-        # this doesn't work and idk why
-        # for p in self.particles:
-        #     p = util.sample(self.beliefs)
 
-        for i,p in enumerate(self.particles):
-            self.particles[i] = util.sample(self.beliefs)    
-
+          
+        self.particles = [util.sample(self.beliefs) for i in range(self.numParticles)]
     def getBeliefDistribution(self):
         """
           Return the agent's current belief state, a distribution over
@@ -576,7 +575,10 @@ class JointParticleFilter:
             # now loop through and update each entry in newParticle...
 
             "*** YOUR CODE HERE ***"
-
+            for i in range(self.numGhosts):
+                prevGhostPositions = list(oldParticle)
+                newPositionDistribution = getPositionDistributionForGhost(setGhostPositions(gameState, prevGhostPositions), i, self.ghostAgents[i])
+                newParticle[i] = util.sample(newPositionDistribution)
             "*** END YOUR CODE HERE ***"
             newParticles.append(tuple(newParticle))
         self.particles = newParticles
