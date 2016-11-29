@@ -344,6 +344,7 @@ def buildNeuralNet(examples, alpha=0.1, weightChangeThreshold = 0.00008,hiddenLa
     iteration=0
     trainError=0
     weightMod=0
+    # print examplesTrain[0]
     while (iteration == 0 or weightMod > weightChangeThreshold) and iteration < maxItr:
         iteration += 1
         trainError, weightMod = nnet.backPropLearning(alpha = alpha, examples = examplesTrain)
@@ -371,16 +372,25 @@ def buildNeuralNet(examples, alpha=0.1, weightChangeThreshold = 0.00008,hiddenLa
     testCorrect = 0     
     
     testAccuracy=0#num correct/num total
-    allLayerOutput = nnet.feedForward(examplesTest[0])    
-    lastLayerOutput = allLayerOutput[-1]
-    for i in len(lastLayerOutput):
-        if lastLayerOutput[i] == examplesTest[1][i]:
+    for example in examplesTest:
+        allLayerOutput = nnet.feedForward(example[0])    
+        lastLayerOutput = allLayerOutput[-1]
+        # print lastLayerOutput
+        # print example[1]
+        # print lastLayerOutput
+        for i in range(len(lastLayerOutput)):
+            if lastLayerOutput[i] >= 0.5:
+                lastLayerOutput[i] = 1
+            else:
+                lastLayerOutput[i] = 0
+        if lastLayerOutput == example[1]:
             testCorrect += 1
         else:
             testError += 1
-    testAccuracy = testCorrect/(testCorrect+testError)
+    
+    testAccuracy = testCorrect/(0.0+testCorrect+testError)
     print 'Feed Forward Test correctly classified %d, incorrectly classified %d, test percent error  %f\n'%(testCorrect,testError,testAccuracy)
     
     """return something"""
 
-
+    return (nnet, testAccuracy)
