@@ -21,6 +21,4 @@ def testCarData(hiddenLayers = [16]):
 
 
 
-if __name__ == "__main__":
-    testPenData()
 
